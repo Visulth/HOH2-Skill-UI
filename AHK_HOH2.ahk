@@ -172,6 +172,7 @@ SetTimer(UpdateOverlay, 100)
 ; UpdateOverlay()
 
 ; Function to update colors dynamically
+
 UpdateOverlay() {
 
     global myGui, skillData, skillColors, cooldownColor
@@ -185,6 +186,23 @@ UpdateOverlay() {
 			skill.guiColor.Opt("Background" "Silver")
 			skill.borderColor.Opt("Background" "Silver")
 			continue
+		}
+		
+		if (WinActive("ahk_exe HWR2.exe"))
+		{
+			if (!skill.guiColor.Visible) 
+				skill.guiColor.Visible := true
+			
+			if (!skill.borderColor.Visible) 
+				skill.borderColor.Visible := true
+		}
+		else
+		{
+			if (skill.guiColor.Visible)
+				skill.guiColor.Visible := false
+			
+			if (skill.borderColor.Visible) 
+				skill.borderColor.Visible := false
 		}
 	
 		color := PixelGetColor(skill.sampleX, skill.sampleY)
