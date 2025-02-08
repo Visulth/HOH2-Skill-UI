@@ -1,21 +1,50 @@
 ﻿#Requires AutoHotkey v2.0
 #HotIf WinActive("ahk_exe HWR2.exe")
 
-; Constants
+;; -- HOTKEYS TO TOGGLE EACH SKILL UI -- ;;
 
-squareSize := 8
-borderSize := 3
-spacing := 8
-yOffset := 50
+~F1::
+{
+	skillData[1].enabled := !(skillData[1].enabled)
+	InitializeOverlay()
+}
+
+~F2::
+{
+	skillData[2].enabled := !(skillData[2].enabled)
+	InitializeOverlay()
+}
+
+~F3::
+{
+	skillData[3].enabled := !(skillData[3].enabled)
+	InitializeOverlay()
+}
+
+~F4::
+{
+	skillData[4].enabled := !(skillData[4].enabled)
+	InitializeOverlay()
+}
+
+;; -- UI Sizes -- ;;
+squareSize := 8 	; Solid fill size in px
+borderSize := 3 	; Border thickness in px
+spacing := 8 		; Space in px between each skill UI
+yOffset := 50 		; Vertical offset from the center of the screen. Increase to move lower.
 
 centerX := (A_ScreenWidth // 2)
 centerY := (A_ScreenHeight // 2) + yOffset
 
-;cooldownColor := "808080" ; When on CD: Solid Gray
-;cooldownColor := "000000" ; When on CD: Solid Black
+;; -- Cooldown Colors -- ;;
+;; Change these if you want the skills to remain on-screen when on cooldown
+;; Set to "Silver" to be invisible
+; cooldownColor := "808080" ; When on CD: Solid Gray
+; cooldownColor := "000000" ; When on CD: Solid Black
 cooldownColor := "Silver" ; When on CD: Silver for transparency
 
-; Colors
+
+;; -- Skill Colors -- ;;
 skillColors := Map(
     "RightClick", "8B4513",  ; Brown
     "Skill1", "0000FF",      ; Blue
@@ -23,14 +52,28 @@ skillColors := Map(
     "Skill3", "FF0000"       ; Red
 )
 
-skillOrder := Map(
-	"RightClick", 0,
-	"Skill1", 1,
-	"Skill2", 2,
-	"Skill3", 3
-)
+;; -- WIP NOT FUNCTIONAL YET -- ;;
+;skillOrder := Map(
+;	"RightClick", 0,
+;	"Skill1", 1,
+;	"Skill2", 2,
+;	"Skill3", 3
+;)
 
-; Calculate skill positions relative to center
+;; -- SKILL INFO --
+;; Customize sampleX and sampleY for your resolution.
+;; These default values of (1067,1354), (1461,1354), (1554,1354), (1646,1354) work on my resolution of 2560x1440.
+;; These refer to the X and Y coordinates of the pixel to be sampled to figure out if the skill is on or off cooldown.
+;; How to Find Your sampleX and Y:
+;;		1. Take a screenshot.
+;;		2. Open image in an editor like Photoshop or Gimp
+;;		3. Get the x,y coordinates of a single pixel on each skill border.
+;;			This should be a pixel along the top edge of each skill border, slightly off-centre.
+;;			The Y-value should be the same for all the skills, so you can just worry about the X coordinate.
+
+;; You can also change the order of the skills by swapping the sample order 
+;; (e.g., if you want to see skill2 before skill1, you'd swap their sampleX values below)
+
 skillData := [	
 	{ name: "RightClick", sampleX: 1067, sampleY: 1354, enabled: true, borderColor: unset, guiColor: unset},
     { name: "Skill1", sampleX: 1461, sampleY: 1354, enabled: true, borderColor: unset, guiColor: unset },
@@ -40,12 +83,9 @@ skillData := [
 
 numSkills := 0
 
-; Create skill dots
-
-;myGui := Gui(, "Skill Cooldowns")
-
 global myGui
 
+;; -- WIP NOT FUNCTIONAL YET -- ;;
 ;GetSlotXPos(skillSlot, dotLength, numMargins, spacing) 
 ;{
 ;	return centerX - (((numMargins * spacing) + (numSkills * dotLength))/2) + (skillSlot * (dotLength+spacing))
@@ -54,12 +94,6 @@ global myGui
 InitializeOverlay()
 {
 	; Create GUI
-	
-	;if (IsSet(myGui)) 
-	;{
-	;	myGui.Destroy()
-	;}
-	
 	myGui := Gui(, "Skill Cooldowns")
 	myGui.Opt("+AlwaysOnTop -Caption +ToolWindow")
 	myGui.BackColor := "Silver"  ; Required for transparency
@@ -83,7 +117,6 @@ InitializeOverlay()
 
 	nextXPos := centerX - (((numMargins * spacing) + (numSkills * dotLength))/2)
 	;nextXPos := 0
-	;nextXPos := GetSlotXPos(
 
 	for skill in skillData {
 
@@ -120,59 +153,23 @@ InitializeOverlay()
 		skill.guiColor.Visible := true
 		skill.borderColor.Visible := true
 		
-		;skill.borderColor := myGui.Add("Progress", "x" xPos-borderSize " y" yPos-borderSize " w" squareSize+(2*borderSize) " h" squareSize+(2*borderSize) " Background000000")
-		;skill.borderColor := myGui.Add("Progress", "x" xPos-borderSize " y" yPos-borderSize " w" squareSize+(2*borderSize) " h" squareSize+(2*borderSize) " Background" skillBorderColor)
-		
 		nextXPos := xPos + spacing + squareSize + (2*borderSize)		
 	}
 
-	; Show GUI centered beneath character
-
+	; Show GUI
 	;myGui.Show("x" centerX - 20 " y" centerY - 10 " NoActivate")
 	myGui.Show("x" 0 " y" 0 " NoActivate")
 }
 
 InitializeOverlay()
 
-~F1::
-{
-	skillData[1].enabled := !(skillData[1].enabled)
-	InitializeOverlay()
-}
-
-~F2::
-{
-	skillData[2].enabled := !(skillData[2].enabled)
-	InitializeOverlay()
-}
-
-~F3::
-{
-	skillData[3].enabled := !(skillData[3].enabled)
-	InitializeOverlay()
-}
-
-~F4::
-{
-	skillData[4].enabled := !(skillData[4].enabled)
-	InitializeOverlay()
-}
-
-;myGui.Show("x" 0 " y" 0 " NoActivate")
-
 ; Timer to update cooldown colors
-
 SetTimer(UpdateOverlay, 100)
 
 ; UpdateOverlay()
 
 ; Function to update colors dynamically
 UpdateOverlay() {
-
-	;if (numSkills < 1)
-	;{
-	;	return
-	;}
 
     global myGui, skillData, skillColors, cooldownColor
 
