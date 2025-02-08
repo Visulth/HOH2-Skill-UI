@@ -17,9 +17,10 @@ By default this program works on my resolution of 2560x1440.
 
 ## Installation Instructions:
 
-Download AHK v2 here: https://www.autohotkey.com/v2/
+- Download AHK v2 here: https://www.autohotkey.com/v2/
+- Download the AHK_HOH2.ahk script from above
 
-After installing, double click the script to run it.
+After AHK v2 is installed, double click the script to run it.
 
 You can close the script and AHK by exiting the program via the tray icon.
 
