@@ -36,6 +36,8 @@ yOffset := 50 		; Vertical offset from the center of the screen. Increase to mov
 centerX := (A_ScreenWidth // 2)
 centerY := (A_ScreenHeight // 2) + yOffset
 
+hideWhenUnfocused := true ; Hides the UI when HOH2 is not focused. Can sometimes hide the UI in unintended situations, so set to false in that case.
+
 ;; -- Cooldown Colors -- ;;
 ;; Change these if you want the skills to remain on-screen when on cooldown
 ;; Set to "Silver" to be invisible
@@ -188,22 +190,25 @@ UpdateOverlay() {
 			continue
 		}
 		
-		if (WinActive("ahk_exe HWR2.exe"))
+		if (hideWhenUnfocused)
 		{
-			if (!skill.guiColor.Visible) 
-				skill.guiColor.Visible := true
-			
-			if (!skill.borderColor.Visible) 
-				skill.borderColor.Visible := true
-		}
-		else
-		{
-			if (skill.guiColor.Visible)
-				skill.guiColor.Visible := false
-			
-			if (skill.borderColor.Visible) 
-				skill.borderColor.Visible := false
-		}
+			if (WinActive("ahk_exe HWR2.exe"))
+			{
+				if (!skill.guiColor.Visible) 
+					skill.guiColor.Visible := true
+				
+				if (!skill.borderColor.Visible) 
+					skill.borderColor.Visible := true
+			}
+			else
+			{
+				if (skill.guiColor.Visible)
+					skill.guiColor.Visible := false
+				
+				if (skill.borderColor.Visible) 
+					skill.borderColor.Visible := false
+			}
+		}		
 	
 		color := PixelGetColor(skill.sampleX, skill.sampleY)
         hexColor := Format("{:06X}", color)
