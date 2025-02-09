@@ -45,6 +45,8 @@ hideWhenUnfocused := true ; Hides the UI when HOH2 is not focused. Can sometimes
 ; cooldownColor := "000000" ; When on CD: Solid Black
 cooldownColor := "Silver" ; When on CD: Silver for transparency
 
+threshold := 150 ; Brightness threshold for ready skills. 
+
 
 ;; -- Skill Colors -- ;;
 skillColors := Map(
@@ -178,8 +180,6 @@ SetTimer(UpdateOverlay, 100)
 UpdateOverlay() {
 
     global myGui, skillData, skillColors, cooldownColor
-
-    threshold := 200  ; Brightness threshold for ready skills
 
     for skill in skillData {
 	
