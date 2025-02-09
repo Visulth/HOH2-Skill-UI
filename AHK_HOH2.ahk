@@ -217,7 +217,7 @@ UpdateOverlay() {
 
     for skill in skillData {
 	
-		if (!skill.enabled || currentSkill > skillsMax)
+		if (!skill.enabled)
 		{
 			skill.guiColor.Opt("Background" "Silver")
 			skill.borderColor.Opt("Background" "Silver")
