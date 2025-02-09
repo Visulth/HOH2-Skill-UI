@@ -27,6 +27,20 @@
 	InitializeOverlay()
 }
 
+;; Switches UI mode between 3 or 4 skills (including right click)
+~F5::
+{
+	global skillsMax
+	skillsMax := skillsMax + 1
+	
+	if (skillsMax > 4)
+	{
+		skillsMax := 3
+	}
+	
+	InitializeOverlay()
+}
+
 ;; -- UI Sizes -- ;;
 squareSize := 8 	; Solid fill size in px
 borderSize := 3 	; Border thickness in px
@@ -64,10 +78,21 @@ skillColors := Map(
 ;	"Skill3", 3
 ;)
 
-;; -- SKILL INFO --
-;; Customize sampleX and sampleY for your resolution.
-;; These default values of (1067,1354), (1461,1354), (1554,1354), (1646,1354) work on my resolution of 2560x1440.
-;; These refer to the X and Y coordinates of the pixel to be sampled to figure out if the skill is on or off cooldown.
+;; -- SKILL ORDER -- ;;
+;; You can also change the order of the skills by swapping their order below
+;; (e.g., if you want to see skill2 before skill1, you'd swap their values below)
+
+skillData := [	
+	{ name: "RightClick", enabled: true, borderColor: unset, guiColor: unset},
+    { name: "Skill1", enabled: true, borderColor: unset, guiColor: unset },
+	{ name: "Skill2", enabled: true, borderColor: unset, guiColor: unset },
+    { name: "Skill3", enabled: true, borderColor: unset, guiColor: unset }
+]
+
+;; -- SKILL POSITIONS --
+;; Customize the sampled X positions for your resolution (which changes slightly based on how many skills you have specced)
+;; These default values of below work on my resolution of 2560x1440.
+;; These refer to the X coordinates of the pixel to be sampled to figure out if the skill is on or off cooldown.
 ;; How to Find Your sampleX and Y:
 ;;		1. Take a screenshot.
 ;;		2. Open image in an editor like Photoshop or Gimp
@@ -75,17 +100,13 @@ skillColors := Map(
 ;;			This should be a pixel along the top edge of each skill border, slightly off-centre.
 ;;			The Y-value should be the same for all the skills, so you can just worry about the X coordinate.
 
-;; You can also change the order of the skills by swapping the sample order 
-;; (e.g., if you want to see skill2 before skill1, you'd swap their sampleX values below)
-
-skillData := [	
-	{ name: "RightClick", sampleX: 1067, sampleY: 1354, enabled: true, borderColor: unset, guiColor: unset},
-    { name: "Skill1", sampleX: 1461, sampleY: 1354, enabled: true, borderColor: unset, guiColor: unset },
-	{ name: "Skill2", sampleX: 1554, sampleY: 1354, enabled: true, borderColor: unset, guiColor: unset },
-    { name: "Skill3", sampleX: 1646, sampleY: 1354, enabled: true, borderColor: unset, guiColor: unset }
+skillPositions := [
+	{skillCount: 3, RightClick: 1125, Skill1: 1505, Skill2: 1598, Skill3: 0, sampleY: 1354},
+	{skillCount: 4, RightClick: 1067, Skill1: 1461, Skill2: 1554, Skill3: 1646, sampleY: 1354}
 ]
 
 numSkills := 0
+skillsMax := 4
 
 global myGui
 
@@ -110,11 +131,18 @@ InitializeOverlay()
 	
 	for skill in skillData
 	{
+		if (numSkills = skillsMax)
+		{
+			skill.enabled := false
+		}
+	
 		if (skill.enabled)
 		{
-			numSkills := numSkills + 1
+			numSkills++
 		}
 	}
+	
+	numSkills := Min(numSkills, skillsMax)
 	
 	;MsgBox(numSkills " skills active")
 
@@ -124,9 +152,13 @@ InitializeOverlay()
 
 	nextXPos := centerX - (((numMargins * spacing) + (numSkills * dotLength))/2)
 	;nextXPos := 0
-
+	
+	currentSkill := 0
+	
 	for skill in skillData {
-
+		
+		currentSkill++
+		
 		if (!skill.enabled)
 		{
 			skill.guiColor.Opt("Background" "Silver")
@@ -179,11 +211,13 @@ SetTimer(UpdateOverlay, 100)
 
 UpdateOverlay() {
 
-    global myGui, skillData, skillColors, cooldownColor
+    global myGui, skillData, skillColors, cooldownColor, skillPositions, skillsMax
+	
+	skillPos := skillPositions[skillsMax-2]  ; Get the corresponding position set
 
     for skill in skillData {
 	
-		if (!skill.enabled)
+		if (!skill.enabled || currentSkill > skillsMax)
 		{
 			skill.guiColor.Opt("Background" "Silver")
 			skill.borderColor.Opt("Background" "Silver")
@@ -210,8 +244,13 @@ UpdateOverlay() {
 			}
 		}		
 	
-		color := PixelGetColor(skill.sampleX, skill.sampleY)
-        hexColor := Format("{:06X}", color)
+		;; color := PixelGetColor(skill.sampleX, skill.sampleY)
+		skillName := skill.name
+		color := PixelGetColor(skillPos.%skillName%, skillPos.sampleY)
+		       
+		
+		
+		hexColor := Format("{:06X}", color)
 
         ; Extract RGB values
         red := Integer("0x" SubStr(hexColor, 1, 2))
