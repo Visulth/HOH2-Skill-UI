@@ -1,6 +1,12 @@
 # AHK v2 Script for Heroes of Hammerwatch 2.
 
-## Provides a Skill UI to show Skill Cooldowns just beneath your character.
+## Features
+
+- Provides a Skill UI to show Skill Cooldowns just beneath your character.
+- Individual skill trackers are toggleable
+- Supports 2 or 3 skills
+- Shows when Right Click is channelling
+- Currently supports 2560x1440p out of the box, other resolutions must be customized (though I can update the script if I receive the particular positions)
 
 ![Skill UI](https://github.com/user-attachments/assets/b59c2164-1a88-427b-828f-26489ebd43ef)
 
@@ -27,6 +33,8 @@ Try increasing **threshold** to make it more sensitive, or decrease to reduce se
 
 ## Sampling Instructions:
 ![Skill UI Instructions](https://github.com/user-attachments/assets/36733b8b-faa0-41e7-b3e5-6c90faf201f2)
+
+When sampling, make sure you don't sample *too far* to the left, since it will show the skill as activated when it's at 95% cooldown.
 
 ## Installation Instructions:
 

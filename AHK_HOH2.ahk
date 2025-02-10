@@ -65,6 +65,7 @@ threshold := 150 ; Brightness threshold for ready skills.
 ;; -- Skill Colors -- ;;
 skillColors := Map(
     "RightClick", "8B4513",  ; Brown
+	"Channel", "ff6a00",	 ; Light brown for channelling
     "Skill1", "0000FF",      ; Blue
     "Skill2", "FFFF00",      ; Yellow
     "Skill3", "FF0000"       ; Red
@@ -99,10 +100,12 @@ skillData := [
 ;;		3. Get the x,y coordinates of a single pixel on each skill border.
 ;;			This should be a pixel along the top edge of each skill border, slightly off-centre.
 ;;			The Y-value should be the same for all the skills, so you can just worry about the X coordinate.
+;; The Channel parameter is a position a few pixels from the 12 o' clock position on the Right Click
+;; which indicates if the skill is channelling since the CD freezes when being held.
 
 skillPositions := [
-	{skillCount: 3, RightClick: 1125, Skill1: 1505, Skill2: 1598, Skill3: 0, sampleY: 1354},
-	{skillCount: 4, RightClick: 1067, Skill1: 1461, Skill2: 1554, Skill3: 1646, sampleY: 1354}
+	{skillCount: 3, RightClick: 1125, Skill1: 1505, Skill2: 1598, Skill3: 0, Channel: 1151, sampleY: 1354},
+	{skillCount: 4, RightClick: 1090, Skill1: 1466, Skill2: 1557, Skill3: 1652, Channel: 1102, sampleY: 1354}
 ]
 
 numSkills := 0
@@ -202,6 +205,8 @@ InitializeOverlay()
 
 InitializeOverlay()
 
+tick := 0
+
 ; Timer to update cooldown colors
 SetTimer(UpdateOverlay, 100)
 
@@ -211,9 +216,11 @@ SetTimer(UpdateOverlay, 100)
 
 UpdateOverlay() {
 
-    global myGui, skillData, skillColors, cooldownColor, skillPositions, skillsMax
+    global myGui, skillData, skillColors, cooldownColor, skillPositions, skillsMax, tick
 	
 	skillPos := skillPositions[skillsMax-2]  ; Get the corresponding position set
+	
+	tick := !tick
 
     for skill in skillData {
 	
@@ -242,32 +249,59 @@ UpdateOverlay() {
 				if (skill.borderColor.Visible) 
 					skill.borderColor.Visible := false
 			}
-		}		
+		}	
 	
 		;; color := PixelGetColor(skill.sampleX, skill.sampleY)
 		skillName := skill.name
+		
 		color := PixelGetColor(skillPos.%skillName%, skillPos.sampleY)
-		       
 		
-		
-		hexColor := Format("{:06X}", color)
-
-        ; Extract RGB values
-        red := Integer("0x" SubStr(hexColor, 1, 2))
-        green := Integer("0x" SubStr(hexColor, 3, 2))
-        blue := Integer("0x" SubStr(hexColor, 5, 2))
-
-        ; Calculate brightness
-        brightness := (0.299 * red) + (0.587 * green) + (0.114 * blue)
+		isActive := IsSkillActive(color)
 
         ; Set color (gray if cooldown, original if ready)
-        newColor := (brightness > threshold) ? skillColors[skill.name] : cooldownColor
+        newColor := (isActive) ? skillColors[skill.name] : cooldownColor
+		newBorder := (isActive) ? "Black" : cooldownColor
 		
-		newBorder := (brightness > threshold) ? "Black" : cooldownColor
+		if (skill.name = "RightClick")
+		{
+			channelPixel := PixelGetColor(skillPos.Channel, skillPos.sampleY)
+			isChannelling := !IsSkillActive(channelPixel)
+			
+			if (isChannelling)
+			{
+				if (tick)
+				{
+					newColor := skillColors["Channel"]
+					newBorder := skillColors["Channel"]
+				}
+				else
+				{
+					newColor := skillColors[skill.name]
+					newBorder := "Black"
+				}								
+			}
+		}
 
         ; Update color dynamically
         skill.guiColor.Opt("Background" newColor)
 		skill.borderColor.Opt("Background" newBorder)
     }
+	
+	IsSkillActive(pixel)
+	{
+		hexColor := Format("{:06X}", pixel)
+		
+		; Extract RGB values
+        red := Integer("0x" SubStr(hexColor, 1, 2))
+        green := Integer("0x" SubStr(hexColor, 3, 2))
+        blue := Integer("0x" SubStr(hexColor, 5, 2))
+	
+		; Calculate brightness
+        brightness := (0.299 * red) + (0.587 * green) + (0.114 * blue)
+		
+		return (brightness > threshold)
+	}
+	
+	
 }
 #HotIf
