@@ -27,6 +27,8 @@ F1, F2, F3, and F4 toggle if the skill's UI shows up (e.g., if you only want to 
 
 F5 switches from 3 skill mode to 2 skill mode.
 
+F6 enables channelling for Right Click -- when enabled, the Right Click icon flashes while the skill is held down.
+
 If the UI doesn't show up ever, it might be having trouble detecting when a skill is available (or unavailable if it always shows up and doesn't disappear per skill) 
 Brightness, gamma, etc can all interfere with the detection.
 Try increasing **threshold** to make it more sensitive, or decrease to reduce sensitivity.
@@ -48,3 +50,4 @@ You can close the script and AHK by exiting the program via the tray icon.
 ## WIP:
 
 - Need to add custom skill ordering
+- Disable channelling pixel from showing up in some menus

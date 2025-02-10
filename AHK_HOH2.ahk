@@ -41,6 +41,12 @@
 	InitializeOverlay()
 }
 
+~F6::
+{
+	global detectChannelling
+	detectChannelling := !detectChannelling
+}
+
 ;; -- UI Sizes -- ;;
 squareSize := 8 	; Solid fill size in px
 borderSize := 3 	; Border thickness in px
@@ -50,6 +56,7 @@ yOffset := 50 		; Vertical offset from the center of the screen. Increase to mov
 centerX := (A_ScreenWidth // 2)
 centerY := (A_ScreenHeight // 2) + yOffset
 
+detectChannelling := false
 hideWhenUnfocused := true ; Hides the UI when HOH2 is not focused. Can sometimes hide the UI in unintended situations, so set to false in that case.
 
 ;; -- Cooldown Colors -- ;;
@@ -110,6 +117,7 @@ skillPositions := [
 
 numSkills := 0
 skillsMax := 4
+; detectChannelling := false
 
 global myGui
 
@@ -262,7 +270,7 @@ UpdateOverlay() {
         newColor := (isActive) ? skillColors[skill.name] : cooldownColor
 		newBorder := (isActive) ? "Black" : cooldownColor
 		
-		if (skill.name = "RightClick")
+		if (detectChannelling and skill.name = "RightClick")
 		{
 			channelPixel := PixelGetColor(skillPos.Channel, skillPos.sampleY)
 			isChannelling := !IsSkillActive(channelPixel)
@@ -285,8 +293,8 @@ UpdateOverlay() {
         ; Update color dynamically
         skill.guiColor.Opt("Background" newColor)
 		skill.borderColor.Opt("Background" newBorder)
-    }
-	
+    }	
+
 	IsSkillActive(pixel)
 	{
 		hexColor := Format("{:06X}", pixel)
@@ -301,7 +309,6 @@ UpdateOverlay() {
 		
 		return (brightness > threshold)
 	}
-	
 	
 }
 #HotIf
