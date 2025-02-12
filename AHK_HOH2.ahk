@@ -53,9 +53,6 @@ borderSize := 3 	; Border thickness in px
 spacing := 8 		; Space in px between each skill UI
 yOffset := 50 		; Vertical offset from the center of the screen. Increase to move lower.
 
-centerX := (A_ScreenWidth // 2)
-centerY := (A_ScreenHeight // 2) + yOffset
-
 detectChannelling := false
 hideWhenUnfocused := true ; Hides the UI when HOH2 is not focused. Can sometimes hide the UI in unintended situations, so set to false in that case.
 
@@ -114,6 +111,9 @@ skillPositions := [
 	{skillCount: 3, RightClick: 1125, Skill1: 1505, Skill2: 1598, Skill3: 0, Channel: 1151, sampleY: 1354},
 	{skillCount: 4, RightClick: 1090, Skill1: 1466, Skill2: 1557, Skill3: 1652, Channel: 1102, sampleY: 1354}
 ]
+
+centerX := (A_ScreenWidth // 2)
+centerY := (A_ScreenHeight // 2) + yOffset
 
 numSkills := 0
 skillsMax := 4
