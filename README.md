@@ -46,6 +46,7 @@ Inside of the script, there is a lot that can be customized:
 - UI fill size and colours
 - Border size and colours
 - UI spacing
+- Order of Skill UI elements
 - Brightness threshold (for detecting when a skill is active or not; some non-standard gamma/brightness settings might require tweaking)
 - Whether channelling is enabled by default (currently set to false by default because the channelling pixel shows up in some unintended menus)
 - Keybinds for skills 1-4, skill mode (either 2 or 3 skills), channelling toggle
@@ -57,5 +58,4 @@ When sampling, make sure you don't sample *too far* to the left, since it will s
 
 ## WIP:
 
-- Need to add custom skill ordering
 - Disable channelling pixel from showing up in some menus

@@ -1,7 +1,7 @@
 ﻿#Requires AutoHotkey v2.0
 #HotIf WinActive("ahk_exe HWR2.exe")
 
-;; -- HOTKEYS TO TOGGLE EACH SKILL UI -- ;;
+;; -- HOTKEYS TO TOGGLE EACH SKILL'S UI -- ;;
 
 ~F1::
 {
@@ -75,26 +75,17 @@ skillColors := Map(
     "Skill3", "FF0000"       ; Red
 )
 
-;; -- WIP NOT FUNCTIONAL YET -- ;;
-;skillOrder := Map(
-;	"RightClick", 0,
-;	"Skill1", 1,
-;	"Skill2", 2,
-;	"Skill3", 3
-;)
-
-;; -- SKILL ORDER -- ;;
-;; You can also change the order of the skills by swapping their order below
-;; (e.g., if you want to see skill2 before skill1, you'd swap their values below)
+;; -- Skill Order -- ;;
+;; You can change the order the skills are drawn below, by changing the "order" parameter
 
 skillData := [	
-	{ name: "RightClick", enabled: true, borderColor: unset, guiColor: unset},
-    { name: "Skill1", enabled: true, borderColor: unset, guiColor: unset },
-	{ name: "Skill2", enabled: true, borderColor: unset, guiColor: unset },
-    { name: "Skill3", enabled: true, borderColor: unset, guiColor: unset }
+	{ name: "RightClick", order: 1, enabled: true, borderColor: unset, guiColor: unset},
+    { name: "Skill1", order: 2, enabled: true, borderColor: unset, guiColor: unset },
+	{ name: "Skill2", order: 3, enabled: true, borderColor: unset, guiColor: unset },
+    { name: "Skill3", order: 4, enabled: true, borderColor: unset, guiColor: unset }
 ]
 
-;; -- SKILL POSITIONS --
+;; -- SKILL SAMPLING POSITIONS --
 ;; Customize the sampled X positions for your resolution (which changes slightly based on how many skills you have specced)
 ;; These default values of below work on my resolution of 2560x1440.
 ;; These refer to the X coordinates of the pixel to be sampled to figure out if the skill is on or off cooldown.
@@ -112,20 +103,15 @@ skillPositions := [
 	{skillCount: 4, RightClick: 1090, Skill1: 1466, Skill2: 1557, Skill3: 1652, Channel: 1102, sampleY: 1354}
 ]
 
+sortedSkills := Map()
+
 centerX := (A_ScreenWidth // 2)
 centerY := (A_ScreenHeight // 2) + yOffset
 
 numSkills := 0
 skillsMax := 4
-; detectChannelling := false
 
 global myGui
-
-;; -- WIP NOT FUNCTIONAL YET -- ;;
-;GetSlotXPos(skillSlot, dotLength, numMargins, spacing) 
-;{
-;	return centerX - (((numMargins * spacing) + (numSkills * dotLength))/2) + (skillSlot * (dotLength+spacing))
-;}
 
 InitializeOverlay()
 {
@@ -151,6 +137,8 @@ InitializeOverlay()
 		{
 			numSkills++
 		}
+		
+		sortedSkills[skill.order] := skill
 	}
 	
 	numSkills := Min(numSkills, skillsMax)
@@ -164,11 +152,10 @@ InitializeOverlay()
 	nextXPos := centerX - (((numMargins * spacing) + (numSkills * dotLength))/2)
 	;nextXPos := 0
 	
-	currentSkill := 0
-	
-	for skill in skillData {
-		
-		currentSkill++
+	;for skill in skillData
+	for order, _skill in sortedSkills
+	{
+		skill := _skill
 		
 		if (!skill.enabled)
 		{
@@ -207,7 +194,6 @@ InitializeOverlay()
 	}
 
 	; Show GUI
-	;myGui.Show("x" centerX - 20 " y" centerY - 10 " NoActivate")
 	myGui.Show("x" 0 " y" 0 " NoActivate")
 }
 
@@ -217,21 +203,21 @@ tick := 0
 
 ; Timer to update cooldown colors
 SetTimer(UpdateOverlay, 100)
-
-; UpdateOverlay()
+UpdateOverlay()
 
 ; Function to update colors dynamically
 
-UpdateOverlay() {
+UpdateOverlay() 
+{
 
-    global myGui, skillData, skillColors, cooldownColor, skillPositions, skillsMax, tick
+    global myGui, skillData, skillColors, cooldownColor, skillPositions, skillsMax, tick, sortedSkills, skillNameMap
 	
 	skillPos := skillPositions[skillsMax-2]  ; Get the corresponding position set
 	
 	tick := !tick
 
-    for skill in skillData {
-	
+    for skill in skillData
+	{	
 		if (!skill.enabled)
 		{
 			skill.guiColor.Opt("Background" "Silver")
@@ -259,7 +245,6 @@ UpdateOverlay() {
 			}
 		}	
 	
-		;; color := PixelGetColor(skill.sampleX, skill.sampleY)
 		skillName := skill.name
 		
 		color := PixelGetColor(skillPos.%skillName%, skillPos.sampleY)
