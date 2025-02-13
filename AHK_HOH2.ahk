@@ -123,8 +123,8 @@ InitializeOverlay()
 	; Create GUI
 	myGui := Gui(, "Skill Cooldowns")
 	
-	;myGui.Opt("+AlwaysOnTop -Caption +ToolWindow")
-	myGui.Opt("+AlwaysOnTop -Caption +E0x8000000 ")
+	myGui.Opt("+AlwaysOnTop -Caption +ToolWindow +E0x20")
+	;myGui.Opt("+AlwaysOnTop -Caption +E0x8000000 +E0x20")
 	
 	myGui.BackColor := "Silver"  ; Required for transparency
 	WinSetTransColor("Silver", myGui)  ; Make black background fully transparent
