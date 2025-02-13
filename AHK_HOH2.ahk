@@ -68,21 +68,26 @@ threshold := 150 ; Brightness threshold for ready skills.
 
 ;; -- Skill Colors -- ;;
 skillColors := Map(
-    "RightClick", "8B4513",  ; Brown
-	"Channel", "ff6a00",	 ; Light brown for channelling
-    "Skill1", "0000FF",      ; Blue
-    "Skill2", "FFFF00",      ; Yellow
-    "Skill3", "FF0000"       ; Red
+    "RightClick", "8B4513",  		; Brown
+    "Skill1", "0000FF",      		; Blue
+    "Skill2", "FFFF00",      		; Yellow
+    "Skill3", "e10000",      		; Red, FF0000, cd0000
+	"RightClickShine", "ff7f23",	; Light brown for channelling/shine, ff6a00, db6d1e
+	"Skill1Shine", "00feff", 		; Pale Blue  ; d2d2ff, 00feff
+	"Skill2Shine", "ffffa9", 		; Pale Yellow, ffffb2, ffffa9
+	"Skill3Shine", "FF0000"  		; Light Red, ffc0c0
 )
+
+shiningSkills := Map()
 
 ;; -- Skill Order -- ;;
 ;; You can change the order the skills are drawn below, by changing the "order" parameter
 
 skillData := [	
-	{ name: "RightClick", order: 1, enabled: true, borderColor: unset, guiColor: unset},
-    { name: "Skill1", order: 2, enabled: true, borderColor: unset, guiColor: unset },
-	{ name: "Skill2", order: 3, enabled: true, borderColor: unset, guiColor: unset },
-    { name: "Skill3", order: 4, enabled: true, borderColor: unset, guiColor: unset }
+	{ name: "RightClick", order: 1, enabled: true, borderColor: unset, guiColor: unset, wasActive: 0},
+    { name: "Skill1", order: 2, enabled: true, borderColor: unset, guiColor: unset, wasActive: 0 },
+	{ name: "Skill2", order: 3, enabled: true, borderColor: unset, guiColor: unset, wasActive: 0 },
+    { name: "Skill3", order: 4, enabled: true, borderColor: unset, guiColor: unset, wasActive: 0 }
 ]
 
 ;; -- SKILL SAMPLING POSITIONS --
@@ -250,10 +255,33 @@ UpdateOverlay()
 		color := PixelGetColor(skillPos.%skillName%, skillPos.sampleY)
 		
 		isActive := IsSkillActive(color)
+		
+		newColor := unset
+		
+		if (isActive)
+		{			
+			if (skill.wasActive < 2)
+			{
+				newColor := skillColors[skill.name . "Shine"]
+				newBorder := skillColors[skill.name . "Shine"]
+				skill.wasActive++
+			}
+			else
+			{
+				newColor := skillColors[skill.name]
+				newBorder := "Black"
+			}
+		}
+		else
+		{
+			newColor := cooldownColor
+			newBorder := cooldownColor
+			skill.wasActive := 0
+		}
 
         ; Set color (gray if cooldown, original if ready)
-        newColor := (isActive) ? skillColors[skill.name] : cooldownColor
-		newBorder := (isActive) ? "Black" : cooldownColor
+        ; newColor := (isActive) ? skillColors[skill.name] : cooldownColor
+		; newBorder := (isActive) ? "Black" : cooldownColor
 		
 		if (detectChannelling and skill.name = "RightClick")
 		{
@@ -264,8 +292,8 @@ UpdateOverlay()
 			{
 				if (tick)
 				{
-					newColor := skillColors["Channel"]
-					newBorder := skillColors["Channel"]
+					newColor := skillColors["RightClickShine"]
+					newBorder := skillColors["RightClickShine"]
 				}
 				else
 				{
@@ -278,6 +306,8 @@ UpdateOverlay()
         ; Update color dynamically
         skill.guiColor.Opt("Background" newColor)
 		skill.borderColor.Opt("Background" newBorder)
+		
+		; skill.wasActive := isActive
     }	
 
 	IsSkillActive(pixel)
